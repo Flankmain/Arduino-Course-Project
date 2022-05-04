@@ -1,36 +1,38 @@
-TARGET = main.c
-NAME = binary
+# "megaflash" instead of "mega flash" because of makefile warnings about overriding previous recipes:
+#	makefile:13: warning: overriding recipe for target 'mega'
+#	makefile:8: warning: ignoring old recipe for target 'mega'
 
-OBJECT = $(NAME).o
-BIN = $(NAME).bin
-HEX = $(NAME).hex
+all: mega, uno, flash mega, flash uno
+buildall: mega, uno
+flashall: megaflash, unoflash
 
-MCU = atmega2560
-MCU_AVRDUDE = m2560
-MEGA_ADDRESS = /dev/ttyACM0
+mega:
+	@echo "Compiling mega..."
+	make -C MEGA/
+	@echo "/nDone compiling MEGA!"
 
-BAUDRATE = 115200
+megaflash:
+	@echo "Flashing mega..."
+	make flash -C MEGA/
+	@echo "/nDone flashing MEGA!"
 
-CC = avr-gcc
-CFLAGS = -Wall -pedantic -g -0s -W1 -mmcu=$(MCU) -DF_CPU=16000000UL
+megaclean:
+	make clean -C MEGA/
+	@echo "/nDone cleaning MEGA!"
 
+uno:
+	@echo "Compiling uno..."
+	make -C UNO/
+	@echo "/nDone compiling UNO!"
 
-default:
+unoflash:
+	@echo "Flashing uno..."
+	make flash -C UNO/
+	@echo "/nDone flashing UNO!"
 
-	@echo "===making object==="
-	$(CC) $(CFLAGs) -c -o $(OBJECT) $(TARGET)
-	@echo ""
+unoclean:
+	make clean -C UNO/
+	@echo "/nDone cleaning UNO!"
 
-	@echo "===making binary==="
-	$(CC) -o $(BIN) $(OBJECT)
-	@echo ""
-	
-	@echo "===turning object file to hex==="
-	avr-objcopy -O ihex -R .eeprom $(BIN) $(HEX)
-	@echo ""
-
-	@echo "===flashing==="
-	sudo avrdude -F -V -c arduino -p $(MCU_AVRDUDE) -P $(MEGA_ADDRESS) -b $(BAUDRATE) -U flash:w:$(HEX)
-	@echo ""
-
-	@echo "Successful flash!"
+test:
+	@echo "/nTEST FUNCTION PRINTS!"

@@ -1,0 +1,11 @@
+TOPOLOGIES
+
+three coloured wire
+	reset =  		pin 9,  port PH6
+	read/write = 	pin 10, port PB4
+	enable =		pin 11, port PB5
+
+data buses
+	PIN 	3, 	4,  5,  6
+	PORT 	PE5 PG5	PE3	PH3	
+	

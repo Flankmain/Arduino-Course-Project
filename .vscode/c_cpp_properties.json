@@ -3,7 +3,10 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}",
+                "/usr/share/arduino/hardware/archlinux-arduino/avr/libraries/*",
+                "/usr/share/arduino/hardware/archlinux-arduino/avr/cores/*"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/avr-gcc",

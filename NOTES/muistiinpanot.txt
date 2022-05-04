@@ -1,0 +1,2 @@
+3.3V arduino outti menee anodeen -> backlight päälle
+groundiin: VSS V0 RW K

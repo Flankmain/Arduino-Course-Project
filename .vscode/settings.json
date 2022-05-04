@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "io.h": "c",
+        "iom2560.h": "c",
+        "sfr_defs.h": "c"
+    }
+}
