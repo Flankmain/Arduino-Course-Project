@@ -222,7 +222,7 @@ choices = [
     ('Find flash target boards', getDevicePath),
     ('Write flash paths', writeFlashPathToConfig),
     
-    ("troubleshooting: avrdude: ser_open(): can't open device \"/dev/tty....\": Permission denied")
+    ("troubleshooting: avrdude: ser_open(): can't open device \"/dev/tty....\": Permission denied", printFlashConfigGuide),
 
     ('Flash both boards', makeFunction(['flashall'])),
     ('Flash MEGA with current firmware build', makeFunction(['megaflash'])),

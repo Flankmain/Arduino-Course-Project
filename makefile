@@ -2,37 +2,43 @@
 #	makefile:13: warning: overriding recipe for target 'mega'
 #	makefile:8: warning: ignoring old recipe for target 'mega'
 
-all: mega, uno, flash mega, flash uno
+MEGAMAKE = "MEGA/makefile
+UNOMAKE = UNO/makefile
+
+all: mega, uno, megaflash, unoflash
 buildall: mega, uno
+
 flashall: megaflash, unoflash
 
 mega:
 	@echo "Compiling mega..."
-	make -C MEGA/
+	make all -C MEGA/ -f makefile
 	@echo "/nDone compiling MEGA!"
 
 megaflash:
 	@echo "Flashing mega..."
-	make flash -C MEGA/
+	make flash -C MEGA/ -f makefile
 	@echo "/nDone flashing MEGA!"
 
 megaclean:
-	make clean -C MEGA/
+	@echo "Cleaning mega..."
+	make flash -C MEGA/ -f makefile
 	@echo "/nDone cleaning MEGA!"
 
 uno:
 	@echo "Compiling uno..."
-	make -C UNO/
+	make flash -C UNO/ -f makefile
 	@echo "/nDone compiling UNO!"
 
 unoflash:
 	@echo "Flashing uno..."
-	make flash -C UNO/
+	make flash -C UNO/ -f makefile
 	@echo "/nDone flashing UNO!"
 
 unoclean:
-	make clean -C UNO/
+	@echo "Cleaning uno..."
+	make clean -C UNO/ -f makefile
 	@echo "/nDone cleaning UNO!"
 
 test:
-	@echo "/nTEST FUNCTION PRINTS!"
+	@echo "TEST FUNCTION PRINTS!"

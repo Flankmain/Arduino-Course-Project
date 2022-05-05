@@ -11,9 +11,9 @@
 // arduino-related libraries
 #include <avr/io.h>
 #include <util/delay.h>
-#include "arduinolibs/megalcd.h"
+#include "megalcd.h"
 
-#include "arduinolibs/keypad.h"
+#include "keypad.h"
 
 //#include "Arduino.h"
 

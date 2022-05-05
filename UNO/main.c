@@ -1,7 +1,7 @@
 #define F_CPU 16000000UL
 
-#ifndef __AVR_ATmega328__
-#define __AVR_ATmega328__
+#ifndef __AVR_ATmega328p__
+#define __AVR_ATmega328p__
 #endif
 
 // standard libraries
@@ -17,10 +17,10 @@
 
 void blink(void) {
     PORTB |= (1 << PORTB7);     // turn onboard led on
-    _delay_ms(50);
+    _delay_ms(500);
     
     PORTB &= ~ (1 << PORTB7);   // turn onboard led off
-    _delay_ms(950);
+    _delay_ms(500);
 }
 
 /*
@@ -29,7 +29,8 @@ void blink(void) {
  * */
 
 void setup(void) {
-    DDRB |= (1 << DDB7); // make the onboard led act as an output 
+    DDRB |= _BV(DDB5);
+    //DDRB |= (1 << DDB7); // make the onboard led act as an output 
 }
 
 void loop() {
