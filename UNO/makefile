@@ -16,6 +16,7 @@ SOURCES :=  $(NAME).c $(LIBSOURCES)# 		all .c files you might want to compile
 HEADERS := $(wildcard $(LIBPATH)/*.h)#		all .h files you have
 OBJECTS := $(patsubst $(LIBPATH)/%.c,$(TEMPDIR)/%.o,$(LIBSOURCES)) $(TEMPDIR)/$(NAME).o
 #patsubst usage: .c file pattern, .o file pattern, list of .c files
+#needlessly complicated but I wanted a subfolder to make the project structure a little bit less cluttered.
 
 #arduino specs
 MCU := atmega328p			#avr-gcc argument
@@ -72,3 +73,6 @@ $(OUT): $(OBJECTS)
 
 %.ppo: %.c
 	$(CC) $(CFLAGS) -E $<
+
+test:
+	echo "TEST POTATO XDXD XD"
