@@ -48,6 +48,27 @@ def listDependencies():
     ''')
 
 
+def printFlashConfigGuide():
+    print('In order to flash you will have to manually write the DEVICE parameter of each makefile to match an address on your system.')
+    print('These are usually /dev/ttyACM0 and /dev/tty/USB0 for the MEGA and UNO respectively')
+    print('The makefiles are /UNO/makefile and /MEGA/makefile')
+    print('(I didn\'t have enough time to do this programmatically, sorry.)\n')
+
+    print(f'To confirm the same device address across reboots and usb ports, you can try this:')
+    print('ls -l /dev/tty{ACM*,USB*}')
+
+    print('''
+    crw-rw---- 1 root uucp 166, 0  5. 5. 12:21 /dev/ttyACM0
+    crw-rw---- 1 root uucp 188, 0  5. 5. 13:06 /dev/ttyUSB0
+    ''')
+
+    print('Take the group (in this case uucp) and run')
+    
+    print('sudo usermod -a -G uucp your_username')
+
+    print('The wizard (option 1 in main menu) can generate single session use codes.')
+
+
 def writeFlashPathToConfig(deviceModel, devicePath):
     unimplemented()
 
@@ -165,6 +186,9 @@ def wizard():
     checkDependencies()
     pressEnterToContinue()
 
+    printFlashConfigGuide()
+    pressEnterToContinue()
+
     devices = ["UNO", "MEGA"]
 
     for device in devices:
@@ -174,7 +198,8 @@ def wizard():
             else:
                 continue
             
-            if 'y' in input(f"Look for new device path of your {device}? (y/n): "):
+            print('Look for new (usb port based) device path of your {device}?')
+            if 'y' in input(f"If you don't do this, use the flash config guide printed previously (y/n): "):
                 path = getDevicePath()
             
             if 'y' in input(f"Do you want to use this path as a new default for {device}? (y/n): "):
@@ -196,6 +221,8 @@ choices = [
     ('Find flash target boards', getDevicePath),
     ('Write flash paths', writeFlashPathToConfig),
     
+    ("troubleshooting: avrdude: ser_open(): can't open device \"/dev/tty....\": Permission denied")
+
     ('Flash both boards', makeFunction(['flashall'])),
     ('Flash MEGA with current firmware build', makeFunction(['megaflash'])),
     ('Flash UNO  with current firmware build', makeFunction(['unoflash'])),
