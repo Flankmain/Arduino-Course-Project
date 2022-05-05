@@ -4,6 +4,8 @@ import subprocess
 import os
 import os.path
 
+from configparser import ConfigParser
+
 import sys
 import traceback
 
@@ -45,11 +47,9 @@ def listDependencies():
         lsusb
     ''')
 
-    print('Would you like to check for dependencies?')
-    answer = input('(y/n): ')
-    
-    if 'y' in answer.lower():
-        checkDependencies()
+
+def writeFlashPathToConfig(deviceModel, devicePath):
+    unimplemented()
 
 def runCommand(command:str, arguments=[]):
     command = [command] #list of words used
@@ -59,18 +59,50 @@ def runCommand(command:str, arguments=[]):
     shellOutput = temp.communicate()[0].decode('utf-8') #ascii 128 to utf-8
     return shellOutput
 
+def runCommandInShell(command:str, arguments=[]):
+    command = [command] #list of words used
+    command.extend(arguments)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    shellOutput = process.communicate(b'\n')
+
+    return shellOutput
 
 def checkDependencies():
     print('This subroutine uses the shell to check for available dependencies')
-    print('It might not be exhaustive but should work for building and flashing.')
+    print('It might not be exhaustive but should work for building and flashing.\n')
+    
+    try:
+        summaries = ((command, runCommandInShell('which', [command])) for command in COMMAND_DEPENDENCIES)
+    except FileNotFoundError:
+        print("Can't use the command 'which' for some reason. Check that you have that installed from your package manager.")
+        exit()
+    except Exception:
+        print("Something went wrong with the call, even though it appears that you have 'which' installed.")
+        exit()
 
-    #command -v mycommand returns all available locations for a given command
-    for command in COMMAND_DEPENDENCIES:
-        shellOutput = runCommand(command='command', arguments=['-v', command])
-        if len(shellOutput) > 5:
-            print(shellOutput, end='')
-        else:
-            print(f"{command} wasn't found.")
+    successes = [summary for summary in summaries if not ('not found' in summary[1])]
+    failures  = [summary for summary in summaries if     ('not found' in summary[1])]
+
+    if len(successes) > 0:
+        print('SUCCESSES:')
+    else:
+        print('\nNO DEPENDENCIES FOUND\n')
+        return
+
+    for item in successes:    
+        command, outputs = item
+        print('  '+command+': '+outputs[0].decode('utf-8'), end='')
+    
+    if len(failures) > 0:
+        print('FAILURES:')
+    else:
+        print('\nAll depencies found!')
+
+    for item in failures:
+        command, outputs = item
+        print(command, end=':')
+        print('  '+outputs[1].decode('utf-8'), end='')
+
     print('')
     
     
@@ -84,7 +116,7 @@ def getDevicePath():
     
     while True:
         try:
-            bus = int(input('Select bus (e.g. BUS 002): ').strip())
+            bus = int(input('Select bus (e.g. 002): ').strip())
             break
         except KeyboardInterrupt:
             return
@@ -93,13 +125,12 @@ def getDevicePath():
 
     while True:
         try:
-            device = int(input('Select device (e.g. Device 001): ').strip())
+            device = int(input('Select device (e.g. 001): ').strip())
             break
         except KeyboardInterrupt:
             return
         except:
             print('Bad input.')
-    
 
     #padding number to have up to 2 leading zeroes: e.g.
     #     1,  13
@@ -114,6 +145,8 @@ def getDevicePath():
     print(f'{devicePath}')
     print(f'The path {"exists!" if os.path.exists(devicePath) else "DOES NOT exist!"}\n')
 
+    return devicePath
+
 
 def makeFunction(arguments:list):
     def mf():
@@ -122,12 +155,46 @@ def makeFunction(arguments:list):
 
     return mf
 
+def pressEnterToContinue():
+    input("\t<press Enter to continue>\n")
+
+def wizard():
+    print('You can press ctrl+c any time to abort flashing.')
+    pressEnterToContinue()
+    
+    checkDependencies()
+    pressEnterToContinue()
+
+    devices = ["UNO", "MEGA"]
+
+    for device in devices:
+        try:
+            if 'y' in input(f"Do you want to flash your {device}? (y/n): "):
+                pass
+            else:
+                continue
+            
+            if 'y' in input(f"Look for new device path of your {device}? (y/n): "):
+                path = getDevicePath()
+            
+            if 'y' in input(f"Do you want to use this path as a new default for {device}? (y/n): "):
+                writeFlashPathToConfig(deviceModel=device, devicePath=path)
+
+            if 'y' in input(f"Do you want to flash {device}? (y/n): "):
+                flasherFunction = makeFunction([f'{device.lower()}flash'])
+                flasherFunction()
+        
+        except KeyboardInterrupt:
+            print(f"\nAborting flashing of your {device}")
+
+
 choices = [
    #('1) Text will be displayed with the number', functionThatIsCalled)
-    ('Read a list of dependencies (recommended)', listDependencies),
+    ('RUN SETUP WIZARD', wizard),
+    
     ('Check for existence of dependencies', checkDependencies),
     ('Find flash target boards', getDevicePath),
-    #('Print flash configuration guide', unimplemented),
+    ('Write flash paths', writeFlashPathToConfig),
     
     ('Flash both boards', makeFunction(['flashall'])),
     ('Flash MEGA with current firmware build', makeFunction(['megaflash'])),
@@ -139,7 +206,7 @@ choices = [
 
     ('Build and flash both boards', makeFunction(['all'])),
 
-    ('TEST MAKE', makeFunction(arguments=['test']))
+    ('Read a list of dependencies', listDependencies)
 ]
 
 def printChoices():
@@ -153,6 +220,7 @@ def menu():
     #print(f'shell output: {myFunction()}')
 
     while True:
+        pressEnterToContinue()
         printChoices()
 
         try:
@@ -162,8 +230,6 @@ def menu():
             
         except Exception:
             print("Wrong input.")
-            print(e)
-
 
         try:
             function()

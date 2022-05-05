@@ -1,0 +1,38 @@
+This is basically just reinterpreting the exercise work's task description.
+
+first page says these things:
+ONE HAS TO DO THESE
+	sense movement, which causes an alarm
+	read keypad
+
+THE OTHER ONE HAS TO
+	display alarm system state
+		password input relayed from other arduino
+
+		examples?:
+			connection status
+			movement detection
+			password time limit ran out
+			similar features
+
+EITHER HAS TO
+	sound alarm when needed.
+
+
+so the system needs to:
+	detect motion
+	sound alarm when needed. (PWM if you want)
+	communicate through wire
+		one micro-controller has sensors
+		the other one gives information to user
+	
+	user can input 4 number password.
+		submit button 		(e.g. keypad)
+		backspace button 	(e.g. keypad)
+		timeout for password input
+
+		"correct!" -> alarms don't do anything (aka buzzer just returns?)
+		"incorrect!"
+		"timeout!"
+
+	state machine structure

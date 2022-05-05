@@ -42,15 +42,6 @@ void testLCD(void) {
     _delay_ms(2000);
 }
 
-/*
- * The first
- * 
- * 
- * 
- * 
- * */
-
-
 void blink(void) {
     PORTB |= (1 << PORTB7);     // turn onboard led on
     _delay_ms(500);

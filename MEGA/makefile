@@ -1,4 +1,5 @@
 
+
 #the name of your .c file 
 NAME := main
 
@@ -17,10 +18,10 @@ OBJECTS := $(patsubst $(LIBPATH)/%.c,$(TEMPDIR)/%.o,$(LIBSOURCES)) $(TEMPDIR)/$(
 #patsubst usage: .c file pattern, .o file pattern, list of .c files
 
 #arduino specs
-MCU := atmega2560
-MCU_AVRDUDE := m2560
-PARTNO := stk500v2
-DEVICE := /dev/ttyACM0# a usually consistent device path, but might have to change for your system. this works on my two arch linux machines. sudo may be needed for make flash.
+MCU := atmega2560		#avr-gcc argument
+MCU_AVRDUDE := m2560	#the argument is different for avrdude
+PARTNO := stk500v2		#default programmer, can be switched to 'arduino'
+DEVICE := /dev/ttyACM0	#semi-consistent device path. linux is different than windows.
 BAUDRATE := 115200
 AVRDUDE_FLAGS := -F -V -D -v
 
@@ -34,7 +35,7 @@ CFLAGS := -Wall -pedantic -mmcu=$(MCU) -std=c99 -g -Os -DF_CPU=16000000UL
 ### boring stuff ###
 
 #compilation mid steps to make avrdude work
-#maybe not strictly necessary in new versions
+#may not be strictly necessary in new versions of avrdude
 HEX := $(COMPDIR)/$(NAME).hex
 OUT := $(COMPDIR)/$(NAME).out
 MAP := $(COMPDIR)/$(NAME).map
