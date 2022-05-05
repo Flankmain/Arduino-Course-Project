@@ -62,11 +62,12 @@ def printFlashConfigGuide():
     crw-rw---- 1 root uucp 188, 0  5. 5. 13:06 /dev/ttyUSB0
     ''')
 
-    print('Take the group (in this case uucp) and run')
+    print('copy the group_name (in this case uucp) and run')
     
-    print('sudo usermod -a -G uucp your_username')
+    print('sudo usermod -a -G group_name your_username')
 
-    print('The wizard (option 1 in main menu) can generate single session use codes.')
+    print('After this, you have to restart or re-login. Sorry for that too.')
+    print('Alternatively, the WIZARD can generate single session use codes.')
 
 
 def writeFlashPathToConfig(deviceModel, devicePath):

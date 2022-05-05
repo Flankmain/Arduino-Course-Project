@@ -1,5 +1,7 @@
 
 
+###FILE STRUCTURE CONFIGURATION
+
 #the name of your .c file 
 NAME := main
 
@@ -17,30 +19,39 @@ HEADERS := $(wildcard $(LIBPATH)/*.h)#		all .h files you have
 OBJECTS := $(patsubst $(LIBPATH)/%.c,$(TEMPDIR)/%.o,$(LIBSOURCES)) $(TEMPDIR)/$(NAME).o
 #patsubst usage: .c file pattern, .o file pattern, list of .c files
 
-#arduino specs
-MCU := atmega2560		#avr-gcc argument
-MCU_AVRDUDE := m2560	#the argument is different for avrdude
-PARTNO := stk500v2		#default programmer, can be switched to 'arduino'
-DEVICE := /dev/ttyACM0	#semi-consistent device path. linux is different than windows.
+
+
+####ARDUINO CONFIGURATION
+MCU := atmega2560			#avr-gcc argument
+MCU_AVRDUDE := m2560		#the argument is different for avrdude
+
+#programmer type can be 'arduino' or 'stk500v2'
+PARTNO := stk500v2
+
+#semi-consistent device path. linux is different than windows.
+DEVICE := /dev/ACM0
 BAUDRATE := 115200
 AVRDUDE_FLAGS := -F -V -D -v
 
-#compilation settings
+
+###COMPILATION SETTINGS
 CC := avr-gcc
 OBJCOPY := avr-objcopy
 SIZE := avr-size -A
 CFLAGS := -Wall -pedantic -mmcu=$(MCU) -std=c99 -g -Os -DF_CPU=16000000UL
 
 
-### boring stuff ###
 
-#compilation mid steps to make avrdude work
-#may not be strictly necessary in new versions of avrdude
+###COMPILATION MIDSTEPS
+#these try to improve avrdude's filetype compatibility
+#this may not be strictly necessary in new versions of avrdude
 HEX := $(COMPDIR)/$(NAME).hex
 OUT := $(COMPDIR)/$(NAME).out
 MAP := $(COMPDIR)/$(NAME).map
 
 
+
+###make definitions
 all: $(HEX)
 
 print:
