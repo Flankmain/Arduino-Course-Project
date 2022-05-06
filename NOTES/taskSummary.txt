@@ -6,14 +6,18 @@ ONE HAS TO DO THESE
 	read keypad
 
 THE OTHER ONE HAS TO
-	display alarm system state
+	display alarm system states
 		password input relayed from other arduino
 
-		examples?:
-			connection status
-			movement detection
+		needed:
+			movement detection (can be just buzzer)
 			password time limit ran out
+
+		examples:
+			connection status			
 			similar features
+
+
 
 EITHER HAS TO
 	sound alarm when needed.

@@ -25,14 +25,15 @@ def unimplemented():
 
 def listDependencies():
     print('''NOTE:
-    \tThis list is probably not exhaustive and probably doesn't work on every distribution.
-    \tIf you get errors about missing functions, you just have to find a way to install them, unfortunately.
+    This list is probably not exhaustive and probably doesn't work on every distribution.
+    If you get errors about missing functions, you just have to find a way to install them, unfortunately.
 
-    On arch the AUR packages 'arduino-avr-core' and 'make' should be enough.
+    On Arch and derived distributions the AUR packages 'arduino-avr-core' and 'make' should be enough.
 
-    0) a linux environment, preferrably arch or derivative
-        The reason is that avrdude -P needs an argument, and I don't know what it is on windows. 
-        If you do, you can manually edit the DEVICE parameter of MEGA/makefile and UNO/makefile 
+    0) a linux environment, preferrably Arch-based.
+        The reason is that 'avrdude -P' needs an argument, and I don't know what it is on windows. 
+        If you do, you can manually edit the DEVICE parameter of MEGA/makefile and UNO/makefile
+        More about this edit is told in the installation WIZARD.
     
     1) avr-gcc is needed for compilation. These commands are used:
         avr-gcc
@@ -62,12 +63,13 @@ def printFlashConfigGuide():
     crw-rw---- 1 root uucp 188, 0  5. 5. 13:06 /dev/ttyUSB0
     ''')
 
-    print('copy the group_name (in this case uucp) and run')
+    print('copy the group name (in this case it\'s "uucp") and run:')
     
     print('sudo usermod -a -G group_name your_username')
 
     print('After this, you have to restart or re-login. Sorry for that too.')
-    print('Alternatively, the WIZARD can generate single session use codes.')
+    print('Alternatively, the WIZARD can generate single session use codes that might work.')
+    print('I haven\'t tested that.')
 
 
 def writeFlashPathToConfig(deviceModel, devicePath):
@@ -76,6 +78,8 @@ def writeFlashPathToConfig(deviceModel, devicePath):
 def runCommand(command:str, arguments=[]):
     command = [command] #list of words used
     command.extend(arguments)
+
+    print(command)
 
     temp = subprocess.Popen(command, stdout = subprocess.PIPE)
     shellOutput = temp.communicate()[0].decode('utf-8') #ascii 128 to utf-8
@@ -218,23 +222,22 @@ choices = [
    #('1) Text will be displayed with the number', functionThatIsCalled)
     ('RUN SETUP WIZARD', wizard),
     
-    ('Check for existence of dependencies', checkDependencies),
-    ('Find flash target boards', getDevicePath),
-    ('Write flash paths', writeFlashPathToConfig),
+    ('\tCheck for existence of dependencies', checkDependencies),
+    ('\tFind flash target boards', getDevicePath),
+    ('\tWrite flash paths\n', writeFlashPathToConfig),
     
-    ("troubleshooting: avrdude: ser_open(): can't open device \"/dev/tty....\": Permission denied", printFlashConfigGuide),
+    
 
-    ('Flash both boards', makeFunction(['flashall'])),
-    ('Flash MEGA with current firmware build', makeFunction(['megaflash'])),
-    ('Flash UNO  with current firmware build', makeFunction(['unoflash'])),
+    ('FLASH BOTH BOARDS (with current firmware build)', makeFunction(['flashall'])),
+    ('\tflash mega', makeFunction(['megaflash'])),
+    ('\tflash uno\n', makeFunction(['unoflash'])),
 
-    ('Flash both firmwares from source', makeFunction(['flashall'])),
-    ('Build MEGA firmware  from source',  makeFunction(['mega'])),
-    ('Build UNO  firmware  from source',  makeFunction(['uno'])),
+    ('BUILD BOTH FIRMWARES (from local source code)', makeFunction(['buildall'])),
+    ('\tbuild uno',  makeFunction(['mega'])),
+    ('\tbuild mega\n', makeFunction(['uno'])),
 
-    ('Build and flash both boards', makeFunction(['all'])),
-
-    ('Read a list of dependencies', listDependencies)
+    ("troubleshoot avrdude: ser_open(): can't open device \"/dev/tty....\": Permission denied", printFlashConfigGuide),
+    ('read about required dependencies', listDependencies)
 ]
 
 def printChoices():

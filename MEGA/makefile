@@ -40,6 +40,7 @@ CFLAGS := -Wall -pedantic -mmcu=$(MCU) -std=c99 -g -Os -DF_CPU=16000000UL
 
 ###make definitions
 all: $(HEX)
+	@echo MAKING ALL IN /MEGA
 
 clean:
 	rm -f $(HEX) $(OUT) $(MAP) $(OBJECTS)
