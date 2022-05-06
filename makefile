@@ -8,6 +8,10 @@ all:
 	$(MAKE) megaflash
 	$(MAKE) unoflash
 
+clean:
+	$(MAKE) megaclean
+	$(MAKE) unoclean
+
 buildall:
 	$(MAKE) mega
 	$(MAKE) uno
@@ -28,12 +32,12 @@ megaflash:
 
 megaclean:
 	@echo "Cleaning mega..."
-	make flash -C MEGA/ -f makefile
+	make clean -C MEGA/ -f makefile
 	@echo "Done cleaning MEGA!"
 
 uno:
 	@echo "Compiling uno..."
-	make flash -C UNO/ -f makefile
+	make all -C UNO/ -f makefile
 	@echo "Done compiling UNO!"
 
 unoflash:

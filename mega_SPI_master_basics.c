@@ -6,6 +6,10 @@
  */ 
 
 /* ATmega2560 (MEGA2560) is master */
+#ifndef __AVR_ATmega2560__
+#define __AVR_ATmega2560__
+#endif
+
 
 #define F_CPU 16000000UL
 #define FOSC 16000000UL // Clock Speed
