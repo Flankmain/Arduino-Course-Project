@@ -1,6 +1,6 @@
 ###FILE CONFIGURATION
 #the name of your .c file 
-NAME := uno_I2C_slave_basics
+NAME := main
 
 ###COMPILATION MIDSTEPS
 #these try to improve avrdude's filetype compatibility

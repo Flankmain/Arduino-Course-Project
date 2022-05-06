@@ -1,6 +1,6 @@
 ###FILE CONFIGURATION
 #the name of your .c file 
-NAME := mega_I2C_master_basics
+NAME := main
 
 ###COMPILATION MIDSTEPS
 #these try to improve avrdude's filetype compatibility
