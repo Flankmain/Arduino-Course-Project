@@ -71,7 +71,9 @@ USART_Receive(FILE *stream)
 FILE uart_output = FDEV_SETUP_STREAM(USART_Transmit, NULL, _FDEV_SETUP_WRITE);
 FILE uart_input = FDEV_SETUP_STREAM(NULL, USART_Receive, _FDEV_SETUP_READ);
 
-int 
+
+// this main is needlessly complicated.
+int
 main(void)
 {
     // initialize keypad
@@ -110,17 +112,6 @@ main(void)
             ;    
         }
         
-        // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that 
-        // only the status bits are read
-        #if 0
-        twi_status = (TWSR & 0xF8); 
-        
-        // print the status bits to the UART for monitoring
-        itoa(twi_status, print_char_array, 16);
-        printf(print_char_array);
-        printf(" ");
-        #endif
-        
         // Send slave address and write command to enter MT mode
         TWDR = 0b10101010; // load slave address and write command
         // Slave address = 85 + write bit '0' as a LSB ---> 170 
@@ -133,33 +124,17 @@ main(void)
         {
             ;
         }
-        
-        // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
-        // only the status bits are read
-        #if 0 
-        twi_status = (TWSR & 0xF8);
-        
-        itoa(twi_status, print_char_array, 16);
-        printf(print_char_array);
-        printf(" ");
-        #endif
-       
-        
-        #if 1
 
         // wait until there is something to transmit
         twi_send_char = '\0';
         while(twi_send_char == '\0') {
             twi_send_char = KEYPAD_GetKey();
-            //todo add other choices
+            //todo make interruptible
         }
         
         printf("CODE: '%c'\n", twi_send_char);
         printf("STARTING TRANSACTION\n");
         twi_send_data[0] = twi_send_char;//this is just quick to test
-
-        #endif
-        
 
         // transmit data to the slave
         for(int8_t twi_data_index = 0; twi_data_index < sizeof(twi_send_data); twi_data_index++)
@@ -175,15 +150,6 @@ main(void)
             {
                 ;
             }
-
-            #if 0
-            // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
-            // only the status bits are read
-            twi_status = (TWSR & 0xF8);
-            itoa(twi_status, print_char_array, 16);
-            printf(print_char_array);
-            printf(" ");
-            #endif
         }
 
         printf("\n");

@@ -1,0 +1,4 @@
+Archive member included to satisfy reference by file (symbol)
+
+/usr/lib/gcc/avr/11.3.0/avr5/libgcc.a(_exit.o)
+                              /usr/lib/gcc/avr/11.3.0/../../../../avr/lib/avr5/crtatmega328p.o (exit)

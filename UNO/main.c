@@ -15,6 +15,7 @@
 #define MYUBRR (FOSC/16/BAUD-1)
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
 #include <util/setbaud.h>
 #include <stdlib.h>
@@ -22,11 +23,13 @@
 #include <ctype.h>
 #include <string.h>
 #include "lcd.h"
+#include "millis.h"
 
 #define SLAVE_ADDRESS 85 // 0b1010101
 
-// the only real global variable in this program
-
+// the only real global variables in this program
+// 0 indicates no timer set
+unsigned long firstNumberMillis = 0;
 
 static void
 USART_init(uint16_t ubrr) // unsigned int
@@ -40,7 +43,6 @@ USART_init(uint16_t ubrr) // unsigned int
     
     /* Set frame format: 8 bit data, 2 stop bit */
     UCSR0C |= (1 << USBS0) | (3 << UCSZ00);
-    
 }
 
 static void
@@ -107,8 +109,6 @@ alarmRoutine()
         PORTB &= ~ (1 << PORTB5);   // turn beeper off
         PORTB &= ~ (1 << PORTB7);   // turn onboard led off
         _delay_ms(300);
-
-        
     }
 }
 
@@ -116,7 +116,7 @@ void
 timeoutRoutine()
 {
     lcd_puts_line(0, "Time's up.");
-    lcd_puts_line(0, "Try again.");
+    lcd_puts_line(1, "Try again.");
     _delay_ms(1000);
 }
 
@@ -129,11 +129,31 @@ correctRoutine()
     _delay_ms(3000);
 }
 
+void
+incorrectRoutine()
+{
+    printf("Incorrect password!\n");
+    lcd_puts_line(0, "Incorrect!");
+    lcd_puts_line(1, "Try again!   ");
+    
+    
+    //beep and flash light once
+    PORTB |= (1 << PORTB5);     // turn beeper on
+    PORTB |= (1 << PORTB7);     // turn onboard led on
+    _delay_ms(300);
+
+    PORTB &= ~ (1 << PORTB5);   // turn beeper off
+    PORTB &= ~ (1 << PORTB7);   // turn onboard led off
+    
+    _delay_ms(2700);
+}
+
 //Should be excluded from timeout
 void
 interpret_keycode(char* code, char* inputtedPassword)
 {
     static int inputted = 0; // number of digits 
+    static int alarmIsOn = 1;
     printf("keycode '%c'\n", code[0]);
 
     // handle numbers
@@ -147,23 +167,30 @@ interpret_keycode(char* code, char* inputtedPassword)
             return;
         }
         
-        //todo add input to inputtedpassword
+        // todo add input to inputtedpassword
         inputtedPassword[inputted] = code[0];
 
         printf("INPUTTED:%s\n", inputtedPassword);
         lcd_puts_line(0, inputtedPassword);
 
         inputted++;
+
+        // set timeout clock
+        if (inputted == 1) {
+            firstNumberMillis = millis();
+        }
+        
         return;
     }
 
     //alarm
-    if(code[0] == 'A')
+    if(code[0] == 'A' && alarmIsOn)
     {
         printf("alarm!\n");
         alarmRoutine();
         lcd_setup();
         lcd_puts_line(0, inputtedPassword);
+        alarmIsOn = 0;
         return;
     }
 
@@ -182,6 +209,10 @@ interpret_keycode(char* code, char* inputtedPassword)
         inputtedPassword[inputted-1] = '\0';
         lcd_puts_line(0, inputtedPassword);
         inputted--;
+
+        if (inputted == 0) {
+            firstNumberMillis = 0;
+        }
         return;
     }
 
@@ -201,6 +232,12 @@ FILE uart_input = FDEV_SETUP_STREAM(NULL, USART_Receive, _FDEV_SETUP_READ);
 int 
 main(void)
 {
+    // enable millis
+    init_millis(16000000UL);
+
+    // enable interrupts (for millis)
+    sei();
+    
     // set onboard led as output
     DDRB |= _BV(DDB5);
 
@@ -228,7 +265,6 @@ main(void)
     const char correctPassword[5]   = "1969\0";
     const char resetPassword[5] = "\0\0\0\0\0"; // will be reset to this
 
-    char test_char_array[16]; // 16-bit array, assumes that the int given is 16-bits
     uint8_t twi_index = 0;
     uint8_t twi_status = 0;
     
@@ -259,9 +295,13 @@ main(void)
         // use waiting time to check for timeout (dumb solution, I know)
         while(!(TWCR & (1 << TWINT)))
         {
-            if (/*timeout*/){
-                timeoutRoutine();
+            // 10 second timeout
+            if (firstNumberMillis != 0 && millis() > 10000)
+            {
+                firstNumberMillis = 0;
 
+                timeoutRoutine();
+                
                 //reset password
                 for (int i=0; i<5; i++){
                     inputtedPassword[i] = '\0';
@@ -313,6 +353,15 @@ main(void)
             {
                 correctRoutine();
                 
+                for (int i=0; i<5; i++){
+                    inputtedPassword[i] = '\0';
+                }
+
+                lcd_setup();
+            }
+            else if (inputtedPassword[3]) {
+                incorrectRoutine();
+
                 for (int i=0; i<5; i++){
                     inputtedPassword[i] = '\0';
                 }
