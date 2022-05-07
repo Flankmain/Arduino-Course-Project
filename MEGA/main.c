@@ -11,7 +11,7 @@
 
 #define F_CPU 16000000UL
 #define FOSC 16000000UL // Clock Speed
-#define BAUD 115200
+#define BAUD 9600
 #define MYUBRR (FOSC/16/BAUD-1)
 //define BAUD 9600
 
@@ -84,10 +84,13 @@ main(void)
     stdout = &uart_output;
     stdin = &uart_input;
     
-    unsigned char twi_send_data_1[20] = "master to slave\n";
-    unsigned char twi_send_data_2[20] = "\0\0";
-    unsigned char* twi_send_data = twi_send_data_2;
-    char test_char_array[16]; // 16-bit array, assumes that the int given is 16-bits
+    unsigned char twi_send_data[20] = "master to slave\n";
+    //unsigned char twi_send_data_2[20] = "\0\0";
+    //unsigned char* twi_send_data = twi_send_data_2;
+
+    unsigned char twi_send_char = '\0';
+    
+    char print_char_array[16]; // 16-bit array, assumes that the int given is 16-bits
     uint8_t twi_status = 0;
     
     // Initialize TWI 
@@ -113,8 +116,8 @@ main(void)
         twi_status = (TWSR & 0xF8); 
         
         // print the status bits to the UART for monitoring
-        itoa(twi_status, test_char_array, 16);
-        printf(test_char_array);
+        itoa(twi_status, print_char_array, 16);
+        printf(print_char_array);
         printf(" ");
         #endif
         
@@ -133,21 +136,30 @@ main(void)
         
         // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
         // only the status bits are read
-        #if 0
+        #if 0 
         twi_status = (TWSR & 0xF8);
         
-        itoa(twi_status, test_char_array, 16);
-        printf(test_char_array);
+        itoa(twi_status, print_char_array, 16);
+        printf(print_char_array);
         printf(" ");
         #endif
        
-        // wait until there is something to transmit
-        while (twi_send_data[0] == '\0') {
-            twi_send_data[0] = KEYPAD_GetKey();
-        }
+        
+        #if 1
 
-        printf("KEYCODE: '%c'\n", twi_send_data[0]);
+        // wait until there is something to transmit
+        twi_send_char = '\0';
+        while(twi_send_char == '\0') {
+            twi_send_char = KEYPAD_GetKey();
+            //todo add other choices
+        }
+        
+        printf("CODE: '%c'\n", twi_send_char);
         printf("STARTING TRANSACTION\n");
+        twi_send_data[0] = twi_send_char;//this is just quick to test
+
+        #endif
+        
 
         // transmit data to the slave
         for(int8_t twi_data_index = 0; twi_data_index < sizeof(twi_send_data); twi_data_index++)
@@ -168,19 +180,19 @@ main(void)
             // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
             // only the status bits are read
             twi_status = (TWSR & 0xF8);
-            itoa(twi_status, test_char_array, 16);
-            printf(test_char_array);
+            itoa(twi_status, print_char_array, 16);
+            printf(print_char_array);
             printf(" ");
             #endif
         }
+
         printf("\n");
-        twi_send_data[0] = '\0';
         
         // stop transmission by sending STOP
         TWCR = (1 << TWINT) | (1 << TWSTO) |(1 << TWEN);
 
-        _delay_ms(1000);       
+        _delay_ms(1000);
     }
-    
+
     return 0;
 }
