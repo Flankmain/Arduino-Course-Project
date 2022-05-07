@@ -37,15 +37,15 @@ SIZE := avr-size -A
 #-Os is on for stability and for very precise timings to work properly.
 CFLAGS := -Wall -pedantic -mmcu=$(MCU) -std=c99 -g -Os -DF_CPU=16000000UL
 
-
 ###make definitions
 all: $(HEX)
-	@echo MAKING ALL IN /MEGA
+	@echo MAKING ALL IN MEGA
 
 clean:
 	rm -f $(HEX) $(OUT) $(MAP) $(OBJECTS)
 
 flash: $(HEX)
+	@echo FLASHING MEGA
 	avrdude $(AVRDUDE_FLAGS) -c $(PROGRAMMER) -p $(MCU_AVRDUDE) -P $(DEVICE) -b $(BAUDRATE) -U flash:w:$(HEX)
 
 $(HEX): $(OUT)

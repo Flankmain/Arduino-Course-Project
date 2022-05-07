@@ -1,0 +1,9 @@
+
+'0' - '9'
+	password stored in char array.
+	strcmp = 0 says that both are same.
+
+'A' for submit.
+
+'B' for beeper.
+

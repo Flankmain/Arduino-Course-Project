@@ -31,9 +31,17 @@ def listDependencies():
     On Arch and derived distributions the AUR packages 'arduino-avr-core' and 'make' should be enough.
 
     0) a linux environment, preferrably Arch-based.
-        The reason is that 'avrdude -P' needs an argument, and I don't know what it is on windows. 
-        If you do, you can manually edit the DEVICE parameter of MEGA/makefile and UNO/makefile
-        More about this edit is told in the installation WIZARD.
+        The reason is the device ports are programmatically extracted by this wizard.
+        On windows you can just use device manager instead. 
+        
+        LINUX:   dev/ttyACM... and dev/ttyUSB...
+        WINDOWS: COM1, COM2 or something similar.
+        
+
+    1) makefile parameters
+        You have to manually edit the DEVICE parameter of MEGA/makefile and UNO/makefile
+        On windows this argument can be found by the WIZARD or by running ls -l /dev/tty{ACM*,USB*}
+        On linux you also might need to give yourself permissions on the device port.
     
     1) avr-gcc is needed for compilation. These commands are used:
         avr-gcc
@@ -220,14 +228,12 @@ def wizard():
 
 choices = [
    #('1) Text will be displayed with the number', functionThatIsCalled)
+
     ('RUN SETUP WIZARD', wizard),
-    
     ('\tCheck for existence of dependencies', checkDependencies),
     ('\tFind flash target boards', getDevicePath),
     ('\tWrite flash paths\n', writeFlashPathToConfig),
     
-    
-
     ('FLASH BOTH BOARDS (with current firmware build)', makeFunction(['flashall'])),
     ('\tflash mega', makeFunction(['megaflash'])),
     ('\tflash uno\n', makeFunction(['unoflash'])),
