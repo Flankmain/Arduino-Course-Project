@@ -13,6 +13,7 @@ REMEMBER: Add sei(); after init_millis() to enable global interrupts!
 
 #include "millis.h"
 
+
 ISR(TIMER1_COMPA_vect)
 {
   timer1_millis++;
